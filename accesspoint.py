@@ -126,7 +126,7 @@ print "[+] Interface configured"
 print "[+] Configuring hostapd"
 
 file_hostapd = open(HOSTAPD_CONF_FILE, 'w')
-file_hostapd.write(HOSTAPD_CONF)
+file_hostapd.write(HOSTAPD_CONF+"\n")
 file_hostapd.close()
 
 
@@ -150,7 +150,7 @@ print "[+] Configured!"
 print "[+] Configuring NAT"
 
 file_sysctl= open(SYSCTL_FILE, 'a')
-file_sysctl.write('net.ipv4.ip_forward=1')
+file_sysctl.write('net.ipv4.ip_forward=1 \n')
 file_sysctl.close()
 
 os.system('sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward "')
@@ -162,6 +162,10 @@ os.system("iptables -A FORWARD -i "+DHCP_INT+" -o eth0 -j ACCEPT")
 os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
 
 print "[+] NAT configured!"
+
+print "[+] Starting services"
+
+os.system("service isc-dhcp-server start")
 
 print "[+] DONE!"
 print "[+] To test the access point, run 'sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf'"

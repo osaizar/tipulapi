@@ -81,7 +81,7 @@ file_isc = open(ISC_DHCP_SERVER_CONF_FILE, 'w')
 
 for l in lines:
     if "INTERFACES" in l:
-        file_isc.write('INTERFACES="+'DHCP_INT'+"\n')
+        file_isc.write('INTERFACES="'+DHCP_INT+'"\n')
     else:
         file_isc.write(l+"\n")
 

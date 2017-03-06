@@ -1,15 +1,13 @@
+#!/usr/bin/python
+
 import os
 
+WIFI = True
+IN_INT = "wlan0"
+OUT_INT = "eth0"
+
+
 # conf files
-"""
-DHCPD_CONF_FILE = "conf/dhcpd.conf" # /etc/dhcp/dhcpd.conf
-ISC_DHCP_SERVER_CONF_FILE = "conf/isc-dhcp-server" # /etc/default/isc-dhcp-server
-INT_CONF_FILE = "conf/interfaces" # /etc/network/interfaces
-HOSTAPD_CONF_FILE = "conf/hostapd.conf" # /etc/hostapd/hostapd.conf
-DEF_HOSTAPD_CONF_FILE = "conf/hostapd" # /etc/default/hostapd
-INIT_HOSTAPD_CONF_FILE = "conf/init_hostapd" # /etc/default/hostapd
-SYSCTL_FILE = "conf/sysctl.conf" # /etc/sysctl.conf
-"""
 DHCPD_CONF_FILE = "/etc/dhcp/dhcpd.conf" # /etc/dhcp/dhcpd.conf
 ISC_DHCP_SERVER_CONF_FILE = "/etc/default/isc-dhcp-server" # /etc/default/isc-dhcp-server
 INT_CONF_FILE = "/etc/network/interfaces" # /etc/network/interfaces
@@ -31,16 +29,15 @@ subnet 192.168.55.0 netmask 255.255.255.0 {
  option domain-name-servers 8.8.8.8, 8.8.4.4;
 }
 """
-DHCP_INT = "wlan0"
 
 INT_CONF = """
-iface """+DHCP_INT+"""" inet static
+iface """+IN_INT+"""" inet static
   address 192.168.55.1
   netmask 255.255.255.0
 """
 
 HOSTAPD_CONF = """
-interface="""+DHCP_INT+"""
+interface="""+IN_INT+"""
 # driver=rtl871xdrv (pi3)
 ssid=tipulapi
 country_code=US
@@ -84,14 +81,14 @@ file_dhcpd.write(DHCP_CONF)
 file_dhcpd.close()
 
 print "[+] DHCP server configured"
-print "[+] Enabling DHCP server on "+DHCP_INT
+print "[+] Enabling DHCP server on "+IN_INT
 
 lines = open(ISC_DHCP_SERVER_CONF_FILE, 'r').read().split("\n")
 file_isc = open(ISC_DHCP_SERVER_CONF_FILE, 'w')
 
 for l in lines:
     if "INTERFACES" in l:
-        file_isc.write('INTERFACES="'+DHCP_INT+'"\n')
+        file_isc.write('INTERFACES="'+IN_INT+'"\n')
     else:
         file_isc.write(l+"\n")
 
@@ -99,16 +96,16 @@ file_isc.close()
 
 print "[+] Enabled"
 
-print "[+] Setting static IP address for "+DHCP_INT
+print "[+] Setting static IP address for "+IN_INT
 
-os.system("ifdown "+DHCP_INT)
+os.system("ifdown "+IN_INT)
 
 lines = open(INT_CONF_FILE, 'r').read().split("\n")
 file_int = open(INT_CONF_FILE, 'w')
 
 int_lines = False
 for l in lines:
-    if "iface "+DHCP_INT in l and not int_lines:
+    if "iface "+IN_INT in l and not int_lines:
         file_int.write(INT_CONF)
         int_lines = True
     elif int_lines:
@@ -120,33 +117,36 @@ for l in lines:
 
 file_int.close()
 
-os.system("ifconfig "+DHCP_INT+" 192.168.55.1")
+os.system("ifconfig "+IN_INT+" 192.168.55.1")
 
 print "[+] Interface configured"
-print "[+] Configuring hostapd"
 
-file_hostapd = open(HOSTAPD_CONF_FILE, 'w')
-file_hostapd.write(HOSTAPD_CONF+"\n")
-file_hostapd.close()
+if WIFI:
+    print "[+] Configuring hostapd"
 
-
-file_hostapd = open(DEF_HOSTAPD_CONF_FILE, 'a')
-file_hostapd.write('DAEMON_CONF="'+HOSTAPD_CONF_FILE+'"\n')
-file_hostapd.close()
+    file_hostapd = open(HOSTAPD_CONF_FILE, 'w')
+    file_hostapd.write(HOSTAPD_CONF+"\n")
+    file_hostapd.close()
 
 
-lines = open(INIT_HOSTAPD_CONF_FILE, 'r').read().split("\n")
-file_hostapd = open(INIT_HOSTAPD_CONF_FILE, 'w')
+    file_hostapd = open(DEF_HOSTAPD_CONF_FILE, 'a')
+    file_hostapd.write('DAEMON_CONF="'+HOSTAPD_CONF_FILE+'"\n')
+    file_hostapd.close()
 
-for l in lines:
-    if "DAEMON_CONF=" in l:
-        file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF_FILE+"\n")
-    else:
-        file_hostapd.write(l+"\n")
 
-file_hostapd.close()
+    lines = open(INIT_HOSTAPD_CONF_FILE, 'r').read().split("\n")
+    file_hostapd = open(INIT_HOSTAPD_CONF_FILE, 'w')
 
-print "[+] Configured!"
+    for l in lines:
+        if "DAEMON_CONF=" in l:
+            file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF_FILE+"\n")
+        else:
+            file_hostapd.write(l+"\n")
+
+    file_hostapd.close()
+
+    print "[+] Configured!"
+
 print "[+] Configuring NAT"
 
 file_sysctl= open(SYSCTL_FILE, 'a')
@@ -155,9 +155,9 @@ file_sysctl.close()
 
 os.system('sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward "')
 
-os.system("iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE")
-os.system("iptables -A FORWARD -i eth0 -o "+DHCP_INT+" -m state --state RELATED,ESTABLISHED -j ACCEPT")
-os.system("iptables -A FORWARD -i "+DHCP_INT+" -o eth0 -j ACCEPT")
+os.system("iptables -t nat -A POSTROUTING -o "+OUT_INT+" -j MASQUERADE")
+os.system("iptables -A FORWARD -i "+OUT_INT+" -o "+IN_INT+" -m state --state RELATED,ESTABLISHED -j ACCEPT")
+os.system("iptables -A FORWARD -i "+IN_INT+" -o "OUT_INT" -j ACCEPT")
 
 os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
 

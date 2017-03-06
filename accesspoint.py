@@ -156,8 +156,8 @@ file_sysctl.close()
 os.system('sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward "')
 
 os.system("iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE")
-os.system("iptables -A FORWARD -i eth0 -o "+DHCP_CONF+" -m state --state RELATED,ESTABLISHED -j ACCEPT")
-os.system("iptables -A FORWARD -i "+DHCP_CONF+" -o eth0 -j ACCEPT")
+os.system("iptables -A FORWARD -i eth0 -o "+DHCP_INT+" -m state --state RELATED,ESTABLISHED -j ACCEPT")
+os.system("iptables -A FORWARD -i "+DHCP_INT+" -o eth0 -j ACCEPT")
 
 os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
 

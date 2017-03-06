@@ -14,15 +14,15 @@ DHCP_CONF = """subnet 192.168.55.0 netmask 255.255.255.0 {
 
 os.system("apt install hostapd isc-dhcp-server iptables-persistent -y")
 
+lines = open(DHCPD_CONF_FILE, 'r').read().split("\n")
 file_dhcpd = open(DHCPD_CONF_FILE, 'w')
-lines = file_dhcpd.read().split("\n")
 
 for l in lines:
     if l == 'option domain-name "example.org"':
         file_dhcpd.write("#"+l+"\n")
-    if l == 'option domain-name-servers ns1.example.org, ns2.example.org;'
+    if l == 'option domain-name-servers ns1.example.org, ns2.example.org;':
         file_dhcpd.write("#"+l+"\n")
-    if l == '#authoritative;'
+    if l == '#authoritative;':
         file_dhcpd.write("authoritative\n")
     else:
         file_dhcpd.write(l+"\n")

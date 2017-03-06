@@ -1,6 +1,7 @@
 import os
 
 # conf files
+"""
 DHCPD_CONF_FILE = "conf/dhcpd.conf" # /etc/dhcp/dhcpd.conf
 ISC_DHCP_SERVER_CONF_FILE = "conf/isc-dhcp-server" # /etc/default/isc-dhcp-server
 INT_CONF_FILE = "conf/interfaces" # /etc/network/interfaces
@@ -8,6 +9,15 @@ HOSTAPD_CONF_FILE = "conf/hostapd.conf" # /etc/hostapd/hostapd.conf
 DEF_HOSTAPD_CONF_FILE = "conf/hostapd" # /etc/default/hostapd
 INIT_HOSTAPD_CONF_FILE = "conf/init_hostapd" # /etc/default/hostapd
 SYSCTL_FILE = "conf/sysctl.conf" # /etc/sysctl.conf
+"""
+DHCPD_CONF_FILE = "/etc/dhcp/dhcpd.conf" # /etc/dhcp/dhcpd.conf
+ISC_DHCP_SERVER_CONF_FILE = "/etc/default/isc-dhcp-server" # /etc/default/isc-dhcp-server
+INT_CONF_FILE = "/etc/network/interfaces" # /etc/network/interfaces
+HOSTAPD_CONF_FILE = "/etc/hostapd/hostapd.conf" # /etc/hostapd/hostapd.conf
+DEF_HOSTAPD_CONF_FILE = "/etc/default/hostapd" # /etc/default/hostapd
+INIT_HOSTAPD_CONF_FILE = "/etc/init.d/hostapd" # /etc/default/hostapd
+SYSCTL_FILE = "/etc/sysctl.conf" # /etc/sysctl.conf
+
 
 # conf parameters
 DHCP_CONF = """

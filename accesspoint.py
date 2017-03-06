@@ -157,7 +157,7 @@ os.system('sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward "')
 
 os.system("iptables -t nat -A POSTROUTING -o "+OUT_INT+" -j MASQUERADE")
 os.system("iptables -A FORWARD -i "+OUT_INT+" -o "+IN_INT+" -m state --state RELATED,ESTABLISHED -j ACCEPT")
-os.system("iptables -A FORWARD -i "+IN_INT+" -o "OUT_INT" -j ACCEPT")
+os.system("iptables -A FORWARD -i "+IN_INT+" -o "+OUT_INT+" -j ACCEPT")
 
 os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
 

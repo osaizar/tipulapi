@@ -15,8 +15,8 @@ WPA_PASSWORD = ""
 # conf files
 DHCPD_FILE = "/etc/dhcp/dhcpd.conf" # /etc/dhcp/dhcpd.conf
 ISC_DHCP_FILE = "/etc/default/isc-dhcp-server" # /etc/default/isc-dhcp-server
-INT_CONF = "/etc/network/interfaces" # /etc/network/interfaces
-HOSTAPD_CONF = "/etc/hostapd/hostapd.conf" # /etc/hostapd/hostapd.conf
+INT_FILE = "/etc/network/interfaces" # /etc/network/interfaces
+MAIN_HOSTAPD_FILE = "/etc/hostapd/hostapd.conf" # /etc/hostapd/hostapd.conf
 DEF_HOSTAPD_FILE = "/etc/default/hostapd" # /etc/default/hostapd
 INIT_HOSTAPD_FILE = "/etc/init.d/hostapd" # /etc/default/hostapd
 SYSCTL_FILE = "/etc/sysctl.conf" # /etc/sysctl.conf
@@ -150,13 +150,13 @@ print "[+] Interface configured"
 if HOSTAPD:
     print "[+] Configuring hostapd"
 
-    file_hostapd = open(HOSTAPD_CONF, 'w')
+    file_hostapd = open(MAIN_HOSTAPD_FILE, 'w')
     file_hostapd.write(HOSTAPD_CONF+"\n")
     file_hostapd.close()
 
 
     file_hostapd = open(DEF_HOSTAPD_FILE, 'a')
-    file_hostapd.write('DAEMON_CONF="'+HOSTAPD_CONF+'"\n')
+    file_hostapd.write('DAEMON_CONF="'+MAIN_HOSTAPD_FILE+'"\n')
     file_hostapd.close()
 
 
@@ -168,12 +168,12 @@ if HOSTAPD:
     for l in lines:
         if "DAEMON_CONF=" in l:
             daemon_written = True
-            file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF+"\n")
+            file_hostapd.write("DAEMON_CONF="+MAIN_HOSTAPD_FILE+"\n")
         else:
             file_hostapd.write(l+"\n")
 
     if not daemon_written:
-        file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF+"\n")
+        file_hostapd.write("DAEMON_CONF="+MAIN_HOSTAPD_FILE+"\n")
 
     file_hostapd.close()
 

@@ -2,20 +2,25 @@
 
 import os
 
-WIFI = True
+HOSTAPD = True
+WPA = False
+
 IN_INT = "wlan0"
 OUT_INT = "eth0"
 
+WPA_NAME = ""
+WPA_PASSWORD = ""
+
 
 # conf files
-DHCPD_CONF_FILE = "/etc/dhcp/dhcpd.conf" # /etc/dhcp/dhcpd.conf
-ISC_DHCP_SERVER_CONF_FILE = "/etc/default/isc-dhcp-server" # /etc/default/isc-dhcp-server
-INT_CONF_FILE = "/etc/network/interfaces" # /etc/network/interfaces
-HOSTAPD_CONF_FILE = "/etc/hostapd/hostapd.conf" # /etc/hostapd/hostapd.conf
-DEF_HOSTAPD_CONF_FILE = "/etc/default/hostapd" # /etc/default/hostapd
-INIT_HOSTAPD_CONF_FILE = "/etc/init.d/hostapd" # /etc/default/hostapd
+DHCPD_FILE = "/etc/dhcp/dhcpd.conf" # /etc/dhcp/dhcpd.conf
+ISC_DHCP_FILE = "/etc/default/isc-dhcp-server" # /etc/default/isc-dhcp-server
+INT_CONF = "/etc/network/interfaces" # /etc/network/interfaces
+HOSTAPD_CONF = "/etc/hostapd/hostapd.conf" # /etc/hostapd/hostapd.conf
+DEF_HOSTAPD_FILE = "/etc/default/hostapd" # /etc/default/hostapd
+INIT_HOSTAPD_FILE = "/etc/init.d/hostapd" # /etc/default/hostapd
 SYSCTL_FILE = "/etc/sysctl.conf" # /etc/sysctl.conf
-
+WPA_FILE = "/etc/wpa_supplicant/wpa_supplicant.conf"
 
 # conf parameters
 DHCP_CONF = """
@@ -55,15 +60,27 @@ ieee80211n=1
 wme_enabled=1
 """
 
+WPA_CONF = '''
+network={
+ssid="'''+WPA_NAME+'''"
+psk="'''+WPA_PASSWORD+'''"
+proto=RSN
+key_mgmt=WPA-PSK
+pairwise=CCMP
+auth_alg=OPEN
+}
+'''
+
 print "[+] Installing hostapd, isc-dhcp-server and iptables-persistent..."
 
 os.system("apt install hostapd isc-dhcp-server iptables-persistent -y")
 
 print "[+] Configuring DHCP server..."
 
-lines = open(DHCPD_CONF_FILE, 'r').read().split("\n")
-file_dhcpd = open(DHCPD_CONF_FILE, 'w')
+lines = open(DHCPD_FILE, 'r').read().split("\n")
+file_dhcpd = open(DHCPD_FILE, 'w')
 
+auth_written = False;
 for l in lines:
     if l == 'option domain-name "example.org";':
         file_dhcpd.write("#"+l+"\n")
@@ -71,26 +88,35 @@ for l in lines:
         file_dhcpd.write("#"+l+"\n")
     elif l == '#authoritative;':
         file_dhcpd.write("authoritative;\n")
+        auth_written = True
     else:
         file_dhcpd.write(l+"\n")
 
+if not auth_written:
+    file_dhcpd.write("authoritative;\n")
+
 file_dhcpd.close()
 
-file_dhcpd = open(DHCPD_CONF_FILE, 'a')
+file_dhcpd = open(DHCPD_FILE, 'a')
 file_dhcpd.write(DHCP_CONF)
 file_dhcpd.close()
 
 print "[+] DHCP server configured"
 print "[+] Enabling DHCP server on "+IN_INT
 
-lines = open(ISC_DHCP_SERVER_CONF_FILE, 'r').read().split("\n")
-file_isc = open(ISC_DHCP_SERVER_CONF_FILE, 'w')
+lines = open(ISC_DHCP_FILE, 'r').read().split("\n")
+file_isc = open(ISC_DHCP_FILE, 'w')
 
+int_written = False
 for l in lines:
     if "INTERFACES" in l:
         file_isc.write('INTERFACES="'+IN_INT+'"\n')
+        int_written = True
     else:
         file_isc.write(l+"\n")
+
+if not int_written:
+    file_isc.write('INTERFACES="'+IN_INT+'"\n')
 
 file_isc.close()
 
@@ -100,8 +126,8 @@ print "[+] Setting static IP address for "+IN_INT
 
 os.system("ifdown "+IN_INT)
 
-lines = open(INT_CONF_FILE, 'r').read().split("\n")
-file_int = open(INT_CONF_FILE, 'w')
+lines = open(INT_CONF, 'r').read().split("\n")
+file_int = open(INT_CONF, 'w')
 
 int_lines = False
 for l in lines:
@@ -121,31 +147,47 @@ os.system("ifconfig "+IN_INT+" 192.168.55.1")
 
 print "[+] Interface configured"
 
-if WIFI:
+if HOSTAPD:
     print "[+] Configuring hostapd"
 
-    file_hostapd = open(HOSTAPD_CONF_FILE, 'w')
+    file_hostapd = open(HOSTAPD_CONF, 'w')
     file_hostapd.write(HOSTAPD_CONF+"\n")
     file_hostapd.close()
 
 
-    file_hostapd = open(DEF_HOSTAPD_CONF_FILE, 'a')
-    file_hostapd.write('DAEMON_CONF="'+HOSTAPD_CONF_FILE+'"\n')
+    file_hostapd = open(DEF_HOSTAPD_FILE, 'a')
+    file_hostapd.write('DAEMON_CONF="'+HOSTAPD_CONF+'"\n')
     file_hostapd.close()
 
 
-    lines = open(INIT_HOSTAPD_CONF_FILE, 'r').read().split("\n")
-    file_hostapd = open(INIT_HOSTAPD_CONF_FILE, 'w')
+    lines = open(INIT_HOSTAPD_FILE, 'r').read().split("\n")
+    file_hostapd = open(INIT_HOSTAPD_FILE, 'w')
+
+    daemon_written = False
 
     for l in lines:
         if "DAEMON_CONF=" in l:
-            file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF_FILE+"\n")
+            daemon_written = True
+            file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF+"\n")
         else:
             file_hostapd.write(l+"\n")
+
+    if not daemon_written:
+        file_hostapd.write("DAEMON_CONF="+HOSTAPD_CONF+"\n")
 
     file_hostapd.close()
 
     print "[+] Configured!"
+
+if WPA:
+    print "[+] Configuring wpa connection to "+WPA_NAME+" network"
+
+    file_wpa = open(WPA_FILE, 'a')
+    file_wpa.write(WPA_CONF)
+    file_wpa.close()
+
+    print "[+] Done!"
+
 
 print "[+] Configuring NAT"
 
@@ -168,4 +210,9 @@ print "[+] Starting services"
 os.system("service isc-dhcp-server start")
 
 print "[+] DONE!"
-print "[+] To test the access point, run 'sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf'"
+
+if HOSTAPD:
+    print "[+] To test the access point, run 'sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf'"
+
+if WPA:
+    print "[+] Now yo can connect to "+WPA_NAME

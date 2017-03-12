@@ -36,7 +36,7 @@ subnet 192.168.55.0 netmask 255.255.255.0 {
 """
 
 INT_CONF = """
-iface """+IN_INT+"""" inet static
+iface """+IN_INT+""" inet static
   address 192.168.55.1
   netmask 255.255.255.0
 """
@@ -126,13 +126,13 @@ print "[+] Setting static IP address for "+IN_INT
 
 os.system("ifdown "+IN_INT)
 
-lines = open(INT_CONF, 'r').read().split("\n")
-file_int = open(INT_CONF, 'w')
+lines = open(INT_FILE, 'r').read().split("\n")
+file_int = open(INT_FILE, 'w')
 
 int_lines = False
 for l in lines:
     if "iface "+IN_INT in l and not int_lines:
-        file_int.write(INT_CONF)
+        file_int.write(INT_CONF+"\n")
         int_lines = True
     elif int_lines:
         if "iface" in l:

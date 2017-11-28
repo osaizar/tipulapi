@@ -63,7 +63,6 @@ def configure_hostapd():
     print "[+] Hostapd pointed into configuration file"
 
     print "[+] Creating init.d service..."
-    INITD_HOSTAPD.set_attrs("DAEMON_CONF="+HOSTAPD.file)
     INITD_HOSTAPD.to_file()
     print "[+] Service created"
     print "[+] Hostapd configured"

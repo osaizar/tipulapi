@@ -8,28 +8,18 @@ class Configurable:
             self.configured = conf
 
     def set_attrs(self, attrs):
-        print "set_attrs"
-        try:
-            if len(attrs) != len(self.tags):
-                print "exception "+str(len(attrs))+" "+str(len(self.tags))
-                Exception("'attrs'-en luzeerak "+str(len(self.tags))+" izan behar du, eta ez "+str(len(attrs)))
+        if len(attrs) != len(self.tags):
+            raise Exception("'attrs'-en luzeerak "+str(len(self.tags))+" izan behar du, eta ez "+str(len(attrs)))
+        else:
+            self.attrs = attrs
+            if self.write_mode == "r":
+                self.replace()
             else:
-                self.attrs = attrs
-                print "attrs "+str(attrs)
-                print "write_mode = "+self.write_mode
-                if self.write_mode == "r":
-                    self.replace()
-                else:
-                    self.configure()
-        except:
-            print "exception"
+                self.configure()
 
     def replace(self):
-        print "replace"
         lines = open(self.file, 'r').read().split("\n")
-        print "lines : "+str(lines)
         for i, t in enumerate(self.tags):
-            print "tag "+t
             written = False
             s = ""
             for l in lines:
@@ -42,7 +32,6 @@ class Configurable:
                 s += self.attrs[i]+"\n"
 
             self.configured = s
-            print self.configured+" "+s # debug
             lines = s.split("\n")
 
     def configure(self):

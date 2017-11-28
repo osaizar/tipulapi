@@ -5,7 +5,7 @@
 import os
 import sys
 from configurables import DHCPD, DHCP_ENABLE, INTERFACES, INITD_HOSTAPD, DEF_HOSTAPD, HOSTAPD, SYSCTL
-import config as c
+import configs as c
 
 def main():
     if not check_root():
@@ -22,16 +22,6 @@ def main():
 
     print "[+] Done!"
     print "[+] To test the access point, run 'sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf'"
-
-def get_config(string, tags, configs):
-    for i in enumerate(tags):
-        string.replace(tags[i], configs[i])
-
-    return string
-
-def append_config(file, string):
-    f = open(file, 'a')
-    f.write(string)
 
 def check_root():
     if os.geteuid() != 0:

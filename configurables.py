@@ -17,7 +17,6 @@ DHCPD = Configurable(DHCPD_CONF,
                     "/etc/dhcp/dhcpd.conf",
                     "a")
 
-
 DHCP_ENABLE = Configurable('INTERFACES="%INT%"',
                            ["INT"],
                            "/etc/default/isc-dhcp-server",
@@ -63,12 +62,13 @@ DEF_HOSTAPD = Configurable("DAEMON_CONF="+HOSTAPD.file+"\n",
                          [],
                          "/etc/default/hostapd",
                          "a")
+
 INITD_HOSTAPD = Configurable("",
                              ["DAEMON_CONF="],
                              "/etc/init.d/hostapd",
                              "r")
 
-INITD_HOSTAPD.set_attrs("DAEMON_CONF="+HOSTAPD_CONF.file)
+INITD_HOSTAPD.set_attrs("DAEMON_CONF="+HOSTAPD.file)
 
 SYSCTL = Configurable("net.ipv4.ip_forward=1 \n",
                       [],

@@ -31,6 +31,7 @@ def check_root():
 
 def install_apt_dependencies():
     print "[+] Installing hostapd, isc-dhcp-server and iptables-persistent..."
+    os.system("apt update")
     os.system("apt install hostapd isc-dhcp-server iptables-persistent -y")
     print "[+] done"
 
@@ -62,6 +63,7 @@ def configure_hostapd():
     print "[+] Hostapd pointed into configuration file"
 
     print "[+] Creating init.d service..."
+    INITD_HOSTAPD.set_attrs("DAEMON_CONF="+HOSTAPD.file)
     INITD_HOSTAPD.to_file()
     print "[+] Service created"
     print "[+] Hostapd configured"

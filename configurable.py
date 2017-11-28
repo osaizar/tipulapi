@@ -33,6 +33,7 @@ class Configurable:
                 s += self.attrs[i]+"\n"
 
             self.configured = s
+            print self.configured # debug
             lines = s.split("\n")
 
     def configure(self):

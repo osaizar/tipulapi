@@ -68,8 +68,6 @@ INITD_HOSTAPD = Configurable("",
                              "/etc/init.d/hostapd",
                              "r")
 
-INITD_HOSTAPD.set_attrs("DAEMON_CONF="+HOSTAPD.file)
-
 SYSCTL = Configurable("net.ipv4.ip_forward=1 \n",
                       [],
                       "/etc/sysctl.conf",

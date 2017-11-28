@@ -11,6 +11,7 @@ class Configurable:
         print "set_attrs"
         try:
             if len(attrs) != len(self.tags):
+                print "exception"
                 Exception("'attrs'-en luzeerak "+str(len(self.tags))+" izan behar du, eta ez "+str(len(attrs)))
             else:
                 self.attrs = attrs

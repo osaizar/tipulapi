@@ -23,6 +23,7 @@ DHCP_ENABLE = Configurable('INTERFACES="%INT%"',
                            "a")
 
 INT_CONF = """
+allow-hotplug eth0
 iface %INTERFACE% inet static
   address %IPADDR%
   netmask %MASK%

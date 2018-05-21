@@ -3,7 +3,7 @@
 # This script configurates hostapd with a dhcp server and forwarding to the given interface
 import os
 import sys
-import functions
+from functions import *
 
 def main():
     if not check_root():
@@ -12,6 +12,7 @@ def main():
 
     install_apt_dependencies('hostapd')
     configure_dhcpd()
+    configure_ip_addr()
     configure_hostapd()
     configure_nat()
 

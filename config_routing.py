@@ -11,6 +11,7 @@ def main():
         sys.exit(1)
 
     install_apt_dependencies('routing')
+    configure_ip_addr()
     configure_dhcpd()
     configure_nat()
 

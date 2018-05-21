@@ -5,8 +5,8 @@ PASS = "raspberry" # wifi password
 
 """ ADVANCED OPTIONS """
 
-IN_INT = "wlan0" # interface where the traffic will enter from
-OUT_INT = "eth0" # interface where the traffic will exit frim
+IN_INT = "eth0" # interface where the traffic will enter from
+OUT_INT = "wlan0" # interface where the traffic will exit frim
 
 """ EVEN MORE ADVANCED OPTIONS, WATCH OUT """
 

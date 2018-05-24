@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# This script configurates the forwarding of a given interface
+# This script configurates the forwarding of a given interface and a dhcp servers
 import os
 import sys
 from functions import *

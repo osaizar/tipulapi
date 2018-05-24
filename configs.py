@@ -1,3 +1,5 @@
+# You can edit this file to configure the scripts.
+
 """ BASIC OPTIONS """
 
 SSID = "pi-wifi" # wifi name

@@ -12,6 +12,8 @@ def check_root():
 def install_apt_dependencies(option):
     if option == "routing":
         install = "isc-dhcp-server iptables-persistent"
+    elif option == "bridge":
+        install = "bridge-utils"
     else: # hostapd
         install = "hostapd isc-dhcp-server iptables-persistent"
 
@@ -69,3 +71,16 @@ def configure_nat():
     os.system('sh -c "iptables-save > /etc/iptables/rules.v4"')
 
     print "[+] NAT configured!"
+
+def configure_bridge():
+    print "[+] Configuring a bridge"
+    print "[+] Enabling forwarding..."
+    SYSCTL.to_file()
+    os.system('sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward "')
+    print "[+] Enabled"
+
+    print "[+] Configuring the bridge"
+    BRIDGE.set_attrs([c.IN_INT, c.OUT_INT])
+    BRIDGE.to_file()
+    os.system("ifup br0")
+    print "[+] Configured!"

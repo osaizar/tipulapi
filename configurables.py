@@ -23,7 +23,7 @@ DHCP_ENABLE = Configurable('INTERFACES="%INT%"',
                            "a")
 
 INT_CONF = """
-allow-hotplug eth0
+allow-hotplug %INTERFACE%
 iface %INTERFACE% inet static
   address %IPADDR%
   netmask %MASK%
@@ -58,6 +58,21 @@ HOSTAPD = Configurable(HOSTAPD_CONF,
                        ["INTERFACE","SSID","PASS"],
                        "/etc/hostapd/hostapd.conf",
                        "w")
+                       
+BRIDGE_CONF = """
+ iface %INT1% inet manual
+
+ iface %INT2% inet manual
+
+ # Bridge setup
+ iface br0 inet dhcp
+    bridge_ports %INT1% %INT2%
+"""
+
+BRIDGE = Configurable(BRIDGE_CONF,
+                      ["INT1","INT2"],
+                      "/etc/network/interfaces",
+                      "a")
 
 DEF_HOSTAPD = Configurable("DAEMON_CONF="+HOSTAPD.file+"\n",
                          [],
